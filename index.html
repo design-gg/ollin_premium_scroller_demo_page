@@ -199,6 +199,7 @@
  const TRANSITION_MS=400;
  let wheelActive=false, wheelDirection=0, wheelAccum=0, wheelLast=0, wheelStepped=false;
  let wheelTimeout=null, touchStart=null, touchUsed=false;
+ let touchLast=null, previousScroll=scrollY, momentumUntil=0;
  const WHEEL_IDLE=180, WHEEL_MIN=22, TOUCH_MIN=46;
 
  function render(){
@@ -270,12 +271,52 @@
    wheelStepped=change(dir,e);
  },{passive:false});
 
+ // Центр баннера в координатах страницы.
+ function anchor(){
+   const r=frame.getBoundingClientRect();
+   return scrollY+r.top-(innerHeight-r.height)/2;
+ }
+ function crosses(from,to,target){
+   return (from<target && to>=target)||(from>target && to<=target);
+ }
+ function capture(){
+   engaged=true;exitDir=0;touchUsed=true;
+   align();previousScroll=scrollY;
+ }
+
+ // Ловим пересечение даже после отпускания пальца, во время инерции.
+ window.addEventListener('scroll',()=>{
+   const current=scrollY,target=anchor();
+   const dir=Math.sign(current-previousScroll);
+   if(engaged && !exitDir){
+     if(Math.abs(current-target)>1)align();
+   }else if((touchStart!==null || performance.now()<momentumUntil) &&
+            dir && exitDir!==dir && crosses(previousScroll,current,target)){
+     capture();
+   }
+   previousScroll=scrollY;
+ },{passive:true});
+
  window.addEventListener('touchstart',e=>{
-   touchStart=e.touches[0]?.clientY??null;touchUsed=false;
+   touchStart=e.touches[0]?.clientY??null;
+   touchLast=touchStart;touchUsed=false;
+   momentumUntil=performance.now()+1600;
+   previousScroll=scrollY;
  },{passive:true});
  window.addEventListener('touchmove',e=>{
    if(touchStart===null)return;
-   const d=touchStart-(e.touches[0]?.clientY??touchStart);
+   const y=e.touches[0]?.clientY??touchLast;
+   const delta=touchLast-y;
+   touchLast=y;
+   const d=touchStart-y,dir=Math.sign(delta);
+   momentumUntil=performance.now()+1600;
+
+   // Перехватываем быстрый свайп до того, как он пролетит центр баннера.
+   if(!engaged && dir && exitDir!==dir &&
+      crosses(scrollY,scrollY+delta,anchor())){
+     if(e.cancelable)e.preventDefault();
+     capture();return;
+   }
    if(touchUsed){
      if(engaged && !exitDir && e.cancelable)e.preventDefault();
      return;
@@ -284,8 +325,13 @@
      touchUsed=change(Math.sign(d),e);
    }else if(engaged && e.cancelable)e.preventDefault();
  },{passive:false});
- window.addEventListener('touchend',()=>{touchStart=null;touchUsed=false;},{passive:true});
- window.addEventListener('touchcancel',()=>{touchStart=null;touchUsed=false;},{passive:true});
+ function finishTouch(){
+   touchStart=null;touchLast=null;
+   // Сохраняем захват и после завершения жеста.
+   momentumUntil=performance.now()+1600;
+ }
+ window.addEventListener('touchend',finishTouch,{passive:true});
+ window.addEventListener('touchcancel',finishTouch,{passive:true});
  window.addEventListener('keydown',e=>{
    const directions={ArrowDown:1,PageDown:1,ArrowUp:-1,PageUp:-1};
    if(!e.repeat && directions[e.key])change(directions[e.key],e);
