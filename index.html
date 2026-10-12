@@ -134,7 +134,7 @@
         <article class="article">
           <div class="label">Демонстрационная статья</div>
           <h1>Как реклама становится частью истории</h1>
-          <p>Прокрутите страницу вниз. В середине материала расположен Premium Scroller. Он закрепится в зоне просмотра, а два шага вниз откроют третий слайд, а два шага вверх - первый.</p><div class="box"></div><h2>Контент до рекламного размещения</h2><p>Эта часть страницы имитирует статью настоящего сайта. Ниже вы увидите рекламный модуль, который не перекрывает страницу целиком и остается внутри ее контекста.</p>
+          <p>Прокрутите страницу вниз. В середине материала расположен Premium Scroller. Он закрепится в зоне просмотра, каждый жест вниз откроет следующий слайд в порядке 2 → 1 → 3. Прокрутка вверх покажет их в обратном порядке.</p><div class="box"></div><h2>Контент до рекламного размещения</h2><p>Эта часть страницы имитирует статью настоящего сайта. Ниже вы увидите рекламный модуль, который не перекрывает страницу целиком и остается внутри ее контекста.</p>
           <p>На мобильном телефоне область масштабируется по ширине. Пропорции исходного макета 1080 × 1920 пикселей сохраняются.</p>
 
 
@@ -158,8 +158,8 @@
           <div class="pin">
             <div class="ad-label">Рекламный формат · Premium Scroller</div>
             <iframe id="ad" class="frame" src="./banner/index.html" title="Демонстрационный баннер Premium Scroller"></iframe>
-            <div class="hint">Колесико вниз: третий слайд · вверх: первый · 
-              <span class="steps" id="step">2 / 4</span> 
+            <div class="hint">Один жест - один слайд · вниз: 2 → 1 → 3 · вверх: обратно · 
+              <span class="steps" id="step">1 / 3</span> 
             · следующий слайд перекрывает предыдущий</div>
           </div>
         </div>
@@ -195,22 +195,24 @@
 (()=>{
  const zone=document.getElementById('zone'),frame=document.getElementById('ad'),
        counter=document.getElementById('step');
- let step=2, engaged=false, exitDir=0;
+ let step=0, engaged=false, exitDir=0, transitionUntil=0;
+ const TRANSITION_MS=400;
  let wheelActive=false, wheelDirection=0, wheelAccum=0, wheelLast=0, wheelStepped=false;
  let wheelTimeout=null, touchStart=null, touchUsed=false;
  const WHEEL_IDLE=180, WHEEL_MIN=22, TOUCH_MIN=46;
 
  function render(){
    frame.contentWindow?.postMessage({type:'PREMIUM_SCROLLER_PROGRESS',progress:step},'*');
-   counter.textContent=step+' / 4';
+   counter.textContent=(step+1)+' / 3';
  }
  function rect(){return zone.getBoundingClientRect();}
  function inActivationRange(){
-   const r=rect();
-   return r.top<innerHeight*.48 && r.bottom>innerHeight*.52;
+   const r=frame.getBoundingClientRect();
+   return r.top < innerHeight * 0.48 && r.bottom > innerHeight * 0.52;
  }
  function align(){
-   window.scrollTo({top:scrollY+rect().top,behavior:'instant'});
+   const r=frame.getBoundingClientRect();
+   window.scrollTo({top:scrollY+r.top-(innerHeight-r.height)/2,behavior:'instant'});
  }
  function change(dir,e){
    if(!inActivationRange()){
@@ -221,12 +223,16 @@
      exitDir=0;
    }
    if(!engaged){engaged=true;align();}
+   if(performance.now()<transitionUntil){
+     if(e?.cancelable)e.preventDefault();
+     return true;
+   }
    const next=step+dir;
-   if(next<0||next>4){
+   if(next<0||next>2){
      engaged=false;exitDir=dir;
      return false; // allow native scroll out of the ad
    }
-   step=next;render();
+   step=next;transitionUntil=performance.now()+TRANSITION_MS;render();
    if(e?.cancelable)e.preventDefault();
    return true;
  }
@@ -261,8 +267,7 @@
      if(engaged && e.cancelable)e.preventDefault();
      return;
    }
-   wheelStepped=true;
-   change(dir,e);
+   wheelStepped=change(dir,e);
  },{passive:false});
 
  window.addEventListener('touchstart',e=>{
@@ -276,8 +281,7 @@
      return;
    }
    if(Math.abs(d)>=TOUCH_MIN){
-     touchUsed=true;
-     change(Math.sign(d),e);
+     touchUsed=change(Math.sign(d),e);
    }else if(engaged && e.cancelable)e.preventDefault();
  },{passive:false});
  window.addEventListener('touchend',()=>{touchStart=null;touchUsed=false;},{passive:true});
