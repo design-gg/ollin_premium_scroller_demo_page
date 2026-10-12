@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Premium Scroller - баннер</title>
+
+  <style>
+    /* Общие стили */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #12202a;
+    }
+
+    .canvas {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      isolation: isolate;
+      container-type: size;
+    }
+
+    /* Слайды */
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .slide-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .s1,
+    .s3 {
+      transition: transform 0.32s cubic-bezier(0.25, 0.8, 0.25, 1);
+      will-change: transform;
+    }
+
+    .s1 {
+      z-index: 3;
+      transform: translateX(-100%);
+    }
+
+    .s2 {
+      z-index: 1;
+      transform: none;
+    }
+
+    .s3 {
+      z-index: 2;
+      transform: translateX(100%);
+    }
+
+    /* Конфетти */
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      overflow: hidden;
+      pointer-events: none;
+      perspective: 850px;
+      transform-style: preserve-3d;
+    }
+
+    .particle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--size);
+      height: auto;
+      opacity: 1;
+      backface-visibility: visible;
+      transform-style: preserve-3d;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+
+    .particle > img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Серебристая оборотная сторона */
+
+    .particle.silver > img {
+      filter: invert(1);
+    }
+
+    /* Блик */
+
+    .glint {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      clip-path: circle(49% at 50% 50%);
+    }
+
+    .glint::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      opacity: 0;
+
+      background: linear-gradient(
+        115deg,
+        transparent 32%,
+        rgba(255, 255, 255, 0.5) 44%,
+        #fff 50%,
+        rgba(255, 255, 255, 0.5) 56%,
+        transparent 68%
+      );
+
+      animation: shine var(--shine-t) linear infinite;
+      animation-delay: var(--shine-d);
+    }
+
+    @keyframes shine {
+      0%,
+      76%,
+      100% {
+        opacity: 0;
+        transform: translateX(-75%);
+      }
+
+      78% {
+        opacity: 0;
+        transform: translateX(-75%);
+      }
+
+      82% {
+        opacity: 1;
+      }
+
+      88% {
+        opacity: 0;
+        transform: translateX(75%);
+      }
+    }
+
+    /* Подпись формата */
+
+    .pill {
+      position: absolute;
+      top: 4%;
+      left: 6%;
+      z-index: 11;
+      padding: 1.2% 3%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 40px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.23);
+      font-size: clamp(10px, 2.5cqw, 28px);
+    }
+
+    /* Уменьшение анимации по настройкам пользователя */
+
+    @media (prefers-reduced-motion: reduce) {
+      .glint {
+        display: none;
+      }
+
+      .s1,
+      .s3 {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="canvas" id="canvas">
+    <section class="slide s1" id="s1">
+      <img
+        class="slide-image"
+        src="assets/slide_01.png"
+        alt="Слайд 1"
+      >
+    </section>
+
+    <section class="slide s2" id="s2">
+      <img
+        class="slide-image"
+        src="assets/slide_02.png"
+        alt="Слайд 2"
+      >
+    </section>
+
+    <section class="slide s3" id="s3">
+      <img
+        class="slide-image"
+        src="assets/slide_03.png"
+        alt="Слайд 3"
+      >
+    </section>
+
+    <div
+      class="particles"
+      id="particles"
+      aria-hidden="true"
+    ></div>
+
+    <span class="pill">1080 × 1920 · 9:16</span>
+  </div>
+
+  <script>
+    (() => {
+      /* Настройки конфетти */
+
+      const settings = {
+        count: 32,
+
+        // Размер в процентах ширины баннера.
+        sizeMin: 2.4,
+        sizeMax: 6.6,
+
+        // Время падения и переворота в секундах.
+        fallMin: 10,
+        fallMax: 20,
+        turnMin: 3.5,
+        turnMax: 7,
+
+        // Интервал появления блика в секундах.
+        shineMin: 3.5,
+        shineMax: 7,
+
+        // Минимальная ширина при перевороте: 0.48 = 48%.
+        minScaleX: 0.48,
+
+        // Диагональное смещение относительно ширины баннера.
+        diagonal: 0.24,
+        startOffsetX: -0.12,
+
+        // Боковое покачивание в пикселях.
+        driftMin: 5,
+        driftMax: 18
+      };
+
+      const confetti = [
+        "confetti_03.svg",
+        "confetti_04.svg",
+        "confetti_05.svg"
+      ];
+
+      /* Элементы и вспомогательные функции */
+
+      const s1 = document.getElementById("s1");
+      const s3 = document.getElementById("s3");
+      const particles = document.getElementById("particles");
+
+      const rand = (min, max) => Math.random() * (max - min) + min;
+      const pick = array => array[Math.floor(Math.random() * array.length)];
+
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      const items = [];
+      let state = 2;
+
+      /* Управление слайдами */
+
+      function setProgress(value) {
+        state = Math.max(0, Math.min(4, Number(value) || 0));
+
+        const left = Math.max(0, Math.min(1, (2 - state) / 2));
+        const right = Math.max(0, Math.min(1, (state - 2) / 2));
+
+        s1.style.transform = `translate3d(${(left - 1) * 100}%, 0, 0)`;
+        s3.style.transform = `translate3d(${(1 - right) * 100}%, 0, 0)`;
+      }
+
+      // Внешний вызов: window.PremiumScroller.setProgress(0..4).
+      window.PremiumScroller = {
+        setProgress,
+        getProgress: () => state
+      };
+
+      // Команды от демо-страницы.
+      window.addEventListener("message", event => {
+        const data = event.data;
+
+        if (
+          data?.type === "PREMIUM_SCROLLER_PROGRESS" &&
+          typeof data.progress === "number"
+        ) {
+          setProgress(data.progress);
+        }
+      });
+
+      /* Создание конфетти */
+
+      for (let i = 0; i < settings.count; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+
+        const image = document.createElement("img");
+        image.src = "assets/" + pick(confetti);
+        image.alt = "";
+        particle.append(image);
+
+        // Блик на каждом втором элементе.
+        if (i % 2 === 0) {
+          const glint = document.createElement("span");
+          glint.className = "glint";
+          particle.append(glint);
+        }
+
+        particle.style.setProperty(
+          "--size",
+          rand(settings.sizeMin, settings.sizeMax).toFixed(2) + "cqw"
+        );
+
+        particle.style.setProperty(
+          "--shine-t",
+          rand(settings.shineMin, settings.shineMax) + "s"
+        );
+
+        particle.style.setProperty(
+          "--shine-d",
+          -rand(0, settings.shineMax) + "s"
+        );
+
+        particles.append(particle);
+
+        items.push({
+          element: particle,
+          x: rand(0, 1),
+          phase: rand(0, 1),
+          duration: rand(settings.fallMin, settings.fallMax),
+          turn: rand(settings.turnMin, settings.turnMax),
+          angle: rand(-45, 45),
+          offset: rand(0, Math.PI * 2),
+          drift: rand(settings.driftMin, settings.driftMax)
+        });
+      }
+
+      /* Движение и перевороты */
+
+      function frame(milliseconds) {
+        const time = reduced ? 0 : milliseconds / 1000;
+        const width = particles.clientWidth;
+        const height = particles.clientHeight;
+
+        for (const item of items) {
+          const progress = (time / item.duration + item.phase) % 1;
+          const theta = time * 2 * Math.PI / item.turn + item.offset;
+          const cosine = Math.cos(theta);
+
+          // Ограничиваем сплющивание при перевороте.
+          const scaleX =
+            settings.minScaleX +
+            (1 - settings.minScaleX) * Math.abs(cosine);
+
+          const scaleY = 0.94 + 0.06 * Math.abs(Math.sin(theta));
+
+          // Смена черной стороны на серебристую.
+          item.element.classList.toggle("silver", cosine < 0);
+
+          const x =
+            (item.x + settings.startOffsetX) * width +
+            progress * width * settings.diagonal +
+            Math.sin(theta * 0.43) * item.drift;
+
+          const y = progress * (height + 100) - 60;
+          const rotation = item.angle + Math.sin(theta * 0.7) * 20;
+
+          item.element.style.transform =
+            `translate3d(${x}px, ${y}px, 0) ` +
+            `rotate(${rotation}deg) ` +
+            `scale(${scaleX}, ${scaleY})`;
+        }
+
+        if (!reduced) {
+          requestAnimationFrame(frame);
+        }
+      }
+
+      /* Запуск */
+
+      requestAnimationFrame(frame);
+      setProgress(2);
+    })();
+  </script>
+</body>
+</html>

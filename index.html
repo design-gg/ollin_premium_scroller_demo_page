@@ -1,0 +1,291 @@
+<!doctype html><html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Premium Scroller — демо в контенте</title>
+  <style>
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:auto}
+    body{
+      margin:0;
+      color:#253344;
+      background:#f5f6f7;
+      font:17px/1.7 system-ui,Arial,sans-serif
+    }
+
+    header{
+      background:white;
+      border-bottom:1px solid #dde2e8;
+      padding:18px max(5vw,20px);
+      font-weight:800;
+      letter-spacing:.04em
+    }
+
+    header small{
+      float:right;
+      color:#75818c;font-weight:400
+    }
+
+      .article{
+        width:min(850px,calc(100% - 36px));
+        margin:0 auto;padding:60px 0
+      }
+
+    h1{
+      font-size:clamp(32px,5vw,56px);
+      line-height:1.1;
+      margin:0 0 25px
+    }
+
+    h2{
+      line-height:1.2
+    }
+
+    p{color:#55616c}
+
+    .box{
+      height:180px;
+      background:linear-gradient(115deg,#d6e1e7,#e8e5dc);
+      border-radius:14px;
+      margin:25px 0
+    }
+
+    .label{
+      color:#69809a;
+      font-size:12px;
+      text-transform:uppercase;
+      font-weight:bold;
+      letter-spacing:.16em}
+
+    .zone{
+      width:min(850px,calc(100% - 36px));
+      height:auto;
+      min-height:0;
+      margin:20px auto;
+      background:none;
+    }
+
+    .pin{
+      position:relative;
+      top:auto;
+      height:auto;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:0;
+      overflow:hidden;
+    }
+
+    .ad-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:#667584;
+      margin:0 0 9px
+    }
+    .frame{
+      height:min(80vh,calc((100vw - 32px) * 16 / 9),760px);
+      width:auto;
+      aspect-ratio:9/16;
+      max-width:calc(100vw - 32px);
+      border:0;
+      pointer-events:none;
+      box-shadow:0 20px 65px rgba(20,33,47,.18);
+      background:#394454
+    }
+
+    .hint{
+      font-size:12px;
+      color:#70808e;
+      text-align:center;
+      margin:10px 0 0
+    }
+
+    .steps{
+      font-variant-numeric:tabular-nums;
+      color:#354f67;
+      font-weight:bold
+    }
+
+    .post{background:white}
+    .post .article{padding-bottom:140px}
+
+    footer{
+      text-align:center;
+      padding:40px;
+      color:#8895a3
+    }
+    @media(max-width:520px){
+      .pin{padding:4px 8px}
+      .frame{height:min(81vh,calc((100vw - 16px) * 16 / 9))}
+      .article{padding:42px 0}.hint{font-size:11px}
+    }
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}}
+
+  </style>
+</head>
+
+
+
+    <body>
+      <header>DEMO · EDITORIAL <small>Premium Scroller / Proof of concept</small></header>
+      <main>
+        <article class="article">
+          <div class="label">Демонстрационная статья</div>
+          <h1>Как реклама становится частью истории</h1>
+          <p>Прокрутите страницу вниз. В середине материала расположен Premium Scroller. Он закрепится в зоне просмотра, а два шага вниз откроют третий слайд, а два шага вверх - первый.</p><div class="box"></div><h2>Контент до рекламного размещения</h2><p>Эта часть страницы имитирует статью настоящего сайта. Ниже вы увидите рекламный модуль, который не перекрывает страницу целиком и остается внутри ее контекста.</p>
+          <p>На мобильном телефоне область масштабируется по ширине. Пропорции исходного макета 1080 × 1920 пикселей сохраняются.</p>
+
+
+<div class="label">Красота и уход</div>
+
+<h2>Укладка, которая подчеркивает ваш стиль</h2>
+
+<p>Повседневная укладка начинается с простого желания: выглядеть так, как вам нравится. Иногда хочется добавить волосам объем, иногда подчеркнуть отдельные пряди или сохранить гладкую форму. Для каждого образа можно подобрать свой подход, не усложняя привычный уход.</p>
+
+<p>Хорошая прическа не обязательно требует много времени. Часто достаточно нескольких точных движений и подходящего средства, чтобы волосы выглядели аккуратно и сохраняли естественную подвижность. Главное - учитывать их длину, текстуру и желаемый результат.</p>
+
+<h2>Объем, форма и естественность</h2>
+
+<p>Перед укладкой определите, какой эффект нужен именно сегодня. Для мягкого объема можно использовать мусс, для выделения отдельных прядей - воск, а для завершающей фиксации - лак. Эти средства решают разные задачи и помогают расставить нужные акценты.</p>
+
+
+<p>Ниже представлены средства для разных этапов укладки. Рассмотрите их и продолжайте чтение: дальше поговорим о завершающих деталях, которые помогают сделать образ цельным.</p>
+
+        </article>
+        <div class="zone" id="zone">
+          <div class="pin">
+            <div class="ad-label">Рекламный формат · Premium Scroller</div>
+            <iframe id="ad" class="frame" src="./banner/index.html" title="Демонстрационный баннер Premium Scroller"></iframe>
+            <div class="hint">Колесико вниз: третий слайд · вверх: первый · 
+              <span class="steps" id="step">2 / 4</span> 
+            · следующий слайд перекрывает предыдущий</div>
+          </div>
+        </div>
+        <div class="post">
+          <article class="article">
+            <div class="label">Продолжение материала</div>
+            <h2>Вы снова прокручиваете страницу</h2>
+            <p>После достижения крайнего слайда следующий шаг скролла возвращает обычную прокрутку страницы без возврата к баннеру. Прокрутка назад в обратном порядке раскрывает предыдущие изображения.</p>
+            <div class="box"></div>
+            <p>Это демонстрация механики. Контроль прокрутки реализован здесь на уровне страницы, а креатив изолирован в отдельном iframe и получает только команды прогресса.</p>
+
+            <h2>Последние штрихи вашего образа</h2>
+
+<p>Когда основная форма готова, посмотрите на прическу целиком. Иногда достаточно поправить несколько прядей у лица, немного приподнять волосы у корней или смягчить слишком четкую линию. Именно небольшие детали делают укладку индивидуальной.</p>
+
+<p>Не стремитесь добиться абсолютной симметрии. Легкая небрежность может выглядеть уместно и естественно, особенно если волосы сохраняют движение. Выбирайте степень аккуратности под настроение, одежду и планы на день.</p>
+
+<h2>Фиксация без лишнего количества средства</h2>
+
+<p>Для завершения укладки используйте средство с подходящей степенью фиксации. Если важно сохранить мягкость и подвижность, начинайте с легкого нанесения. Для более четкой формы уделите внимание отдельным участкам, следуя рекомендациям на упаковке продукта.</p>
+
+<p>Воск удобнее наносить небольшими порциями, предварительно распределив его между ладонями или пальцами. Затем можно выделить кончики, подчеркнуть текстуру или поправить отдельные пряди. Добавляйте продукт постепенно, оценивая результат после каждого движения.</p>
+
+<p>Лак помогает завершить образ и зафиксировать выбранную форму. Наносите его с расстояния, указанного производителем, и избегайте избыточного количества на одном участке. Перед выходом дайте средству высохнуть.</p>
+
+          </article>
+        </div>
+      </main>
+      <footer>Premium Scroller · демонстрационная интеграция</footer>
+      <script>
+
+/* Premium Scroller v6: one scroll gesture = at most one slide step. */
+(()=>{
+ const zone=document.getElementById('zone'),frame=document.getElementById('ad'),
+       counter=document.getElementById('step');
+ let step=2, engaged=false, exitDir=0;
+ let wheelActive=false, wheelDirection=0, wheelAccum=0, wheelLast=0, wheelStepped=false;
+ let wheelTimeout=null, touchStart=null, touchUsed=false;
+ const WHEEL_IDLE=180, WHEEL_MIN=22, TOUCH_MIN=46;
+
+ function render(){
+   frame.contentWindow?.postMessage({type:'PREMIUM_SCROLLER_PROGRESS',progress:step},'*');
+   counter.textContent=step+' / 4';
+ }
+ function rect(){return zone.getBoundingClientRect();}
+ function inActivationRange(){
+   const r=rect();
+   return r.top<innerHeight*.48 && r.bottom>innerHeight*.52;
+ }
+ function align(){
+   window.scrollTo({top:scrollY+rect().top,behavior:'instant'});
+ }
+ function change(dir,e){
+   if(!inActivationRange()){
+     engaged=false;exitDir=0;return false;
+   }
+   if(exitDir){
+     if(exitDir===dir)return false;
+     exitDir=0;
+   }
+   if(!engaged){engaged=true;align();}
+   const next=step+dir;
+   if(next<0||next>4){
+     engaged=false;exitDir=dir;
+     return false; // allow native scroll out of the ad
+   }
+   step=next;render();
+   if(e?.cancelable)e.preventDefault();
+   return true;
+ }
+ function resetWheel(){
+   wheelActive=false;wheelDirection=0;wheelAccum=0;wheelStepped=false;
+ }
+ function normalizeWheel(e){
+   const unit=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;
+   return e.deltaY*unit;
+ }
+ window.addEventListener('wheel',e=>{
+   const dy=normalizeWheel(e);
+   if(Math.abs(dy)<0.5)return;
+   const dir=Math.sign(dy),now=performance.now();
+   // Group wheel events within an idle window into one gesture.
+   // Inertial tails stay in the same group rather than changing two or three slides.
+   if(!wheelActive || dir!==wheelDirection || now-wheelLast>WHEEL_IDLE){
+     resetWheel();wheelActive=true;wheelDirection=dir;
+   }
+   wheelLast=now;
+   clearTimeout(wheelTimeout);
+   wheelTimeout=setTimeout(resetWheel,WHEEL_IDLE);
+   // Once a gesture changes one step, consume its remaining wheel events.
+   if(wheelStepped){
+     if(engaged && !exitDir && e.cancelable)e.preventDefault();
+     return;
+   }
+   // Pixel deltas from trackpads accumulate; a discrete wheel notch
+   // (often around 100px) crosses the threshold on its first event.
+   wheelAccum+=Math.abs(dy);
+   if(wheelAccum<WHEEL_MIN){
+     if(engaged && e.cancelable)e.preventDefault();
+     return;
+   }
+   wheelStepped=true;
+   change(dir,e);
+ },{passive:false});
+
+ window.addEventListener('touchstart',e=>{
+   touchStart=e.touches[0]?.clientY??null;touchUsed=false;
+ },{passive:true});
+ window.addEventListener('touchmove',e=>{
+   if(touchStart===null)return;
+   const d=touchStart-(e.touches[0]?.clientY??touchStart);
+   if(touchUsed){
+     if(engaged && !exitDir && e.cancelable)e.preventDefault();
+     return;
+   }
+   if(Math.abs(d)>=TOUCH_MIN){
+     touchUsed=true;
+     change(Math.sign(d),e);
+   }else if(engaged && e.cancelable)e.preventDefault();
+ },{passive:false});
+ window.addEventListener('touchend',()=>{touchStart=null;touchUsed=false;},{passive:true});
+ window.addEventListener('touchcancel',()=>{touchStart=null;touchUsed=false;},{passive:true});
+ window.addEventListener('keydown',e=>{
+   const directions={ArrowDown:1,PageDown:1,ArrowUp:-1,PageUp:-1};
+   if(!e.repeat && directions[e.key])change(directions[e.key],e);
+ });
+ frame.addEventListener('load',render);render();
+})();
+</script></body></html>
