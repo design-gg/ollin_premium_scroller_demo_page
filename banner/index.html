@@ -232,17 +232,17 @@
       /* Настройки конфетти */
 
       const settings = {
-        count: 32,
+        count: 20,
 
         // Размер в процентах ширины баннера.
-        sizeMin: 2.4,
+        sizeMin: 3.4,
         sizeMax: 6.6,
 
         // Время падения и переворота в секундах.
-        fallMin: 10,
-        fallMax: 20,
-        turnMin: 3.5,
-        turnMax: 7,
+        fallMin: 7,
+        fallMax: 12,
+        turnMin: 5,
+        turnMax: 12,
 
         // Интервал появления блика в секундах.
         shineMin: 3.5,
@@ -252,12 +252,12 @@
         minScaleX: 0.48,
 
         // Диагональное смещение относительно ширины баннера.
-        diagonal: 0.24,
+        diagonal: 0.74,
         startOffsetX: -0.12,
 
         // Боковое покачивание в пикселях.
-        driftMin: 5,
-        driftMax: 18
+        driftMin: 8,
+        driftMax: 24
       };
 
       const confetti = [
@@ -348,6 +348,7 @@
         particles.append(particle);
 
         items.push({
+        	canFlip: i % 3 === 0,
           element: particle,
           x: rand(0, 1),
           phase: rand(0, 1),
@@ -355,7 +356,12 @@
           turn: rand(settings.turnMin, settings.turnMax),
           angle: rand(-45, 45),
           offset: rand(0, Math.PI * 2),
-          drift: rand(settings.driftMin, settings.driftMax)
+          drift: rand(settings.driftMin, settings.driftMax),
+          y: rand(0.05, 0.95),
+		floatX: rand(10, 35),
+		floatY: rand(15, 45),
+		floatSpeed: rand(0.5, 0.9),
+		fallSpeed: rand(0.045, 0.1)
         });
       }
 
@@ -376,17 +382,19 @@
             settings.minScaleX +
             (1 - settings.minScaleX) * Math.abs(cosine);
 
-          const scaleY = 0.94 + 0.06 * Math.abs(Math.sin(theta));
+          const scaleY = 0.74 + 0.06 * Math.abs(Math.sin(theta));
 
           // Смена черной стороны на серебристую.
-          item.element.classList.toggle("silver", cosine < 0);
+        	item.element.classList.toggle("silver", item.canFlip && cosine < 0);
 
-          const x =
-            (item.x + settings.startOffsetX) * width +
-            progress * width * settings.diagonal +
-            Math.sin(theta * 0.43) * item.drift;
+			const x =
+			  item.x * width +
+			  Math.sin(time * item.floatSpeed + item.offset) * item.floatX;
 
-          const y = progress * (height + 100) - 60;
+			const y =
+			  ((item.y + time * item.fallSpeed) % 1) * (height + 100) - 50 +
+			  Math.cos(time * item.floatSpeed * 0.3 + item.offset) * item.floatY;
+
           const rotation = item.angle + Math.sin(theta * 0.7) * 20;
 
           item.element.style.transform =
